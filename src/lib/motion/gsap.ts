@@ -9,9 +9,9 @@
  * ever happens inside effects in the components below.
  */
 
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+// Import the core and plugins from one GSAP entry point so registration and
+// ScrollTrigger creation cannot resolve to separate core instances in bundles.
+import { gsap, ScrollTrigger, SplitText } from "gsap/all";
 
 /**
  * Only the two plugins this site actually uses are registered.
