@@ -329,8 +329,8 @@ export const weddingData = {
       },
       {
         numeral: "IV",
-        name: "Bhojan Samarobh",
-        gu: "ભોજન સમારોભ",
+        name: "Bhojan Samaroh",
+        gu: "ભોજન સમારો",
         date: "12:30 PM",
         note: "The meal",
       },
