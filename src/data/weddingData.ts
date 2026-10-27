@@ -351,7 +351,7 @@ export const weddingData = {
     eyebrow: "Before forever",
     heading: "A story told in photographs",
     sub: "From the sandstone pavilion to the shoreline, a few days we will keep close.",
-    videoUrl: "/Teaser_2.mp4",
+    videoUrl: "https://www.youtube-nocookie.com/embed/xYr2r7IkbdE",
     cta: "Explore our moments",
   },
 
