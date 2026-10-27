@@ -7,6 +7,13 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  // ScrollTrigger and SplitText must share the exact GSAP core instance used by
+  // the app. Keep Vite from bundling a second copy through plugin imports.
+  vite: {
+    resolve: {
+      dedupe: ["gsap"],
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
