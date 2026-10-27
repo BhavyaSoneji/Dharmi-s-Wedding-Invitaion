@@ -1,0 +1,647 @@
+@import "tailwindcss" source(none);
+@import "./envelope.css";
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   SACHIN & DHARMI — design tokens
+   --------------------------------------------------------------------------
+   The page is a dark threshold, eight cream movements, and a dark close. Its
+   green-charcoal grounds echo the pavilion shadows; emerald comes from Dharmi's
+   outfit, with warm stone and restrained brass around the original photographs.
+
+   Contrast discipline: `gold` is for light grounds; `gold-bright` clears
+   4.8:1 on the primary emerald for small text and labels.
+   ========================================================================== */
+
+@theme inline {
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-cream: var(--cream);
+  --color-cream-deep: var(--cream-deep);
+  --color-ink: var(--ink);
+  --color-ground-warm: var(--ground-warm);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-emerald: var(--emerald);
+  --color-emerald-deep: var(--emerald-deep);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-gold-dim: var(--gold-dim);
+}
+
+:root {
+  /* Square corners. Sharp edges are a large part of why the reference reads as
+     printed matter rather than as an app. */
+  --radius: 0.125rem;
+
+  /* Deep green-charcoal used behind the full-bleed hero. */
+  --ground-warm: #17211f;
+
+  /* ── Light grounds ── */
+  --cream: #f1ebe1;
+  --cream-deep: #e5dccc;
+  --background: var(--cream);
+  --secondary: var(--cream-deep);
+  --secondary-foreground: var(--ink);
+  --card: #fbf7f0;
+  --card-foreground: var(--ink);
+
+  /* ── Dark grounds ── */
+  /* Green-charcoal text and dark cinematic sections. */
+  --ink: #131a18;
+  /* Emerald. The Celebrations block, and the only saturated ground on the page. */
+  --emerald: #0f5d4c;
+  --emerald-deep: #0a4034;
+  --ink-foreground: #f1ebe1;
+
+  --primary: var(--emerald);
+  --primary-foreground: var(--cream);
+
+  --foreground: var(--ink);
+  --muted: #e5dccc;
+  /* Clears 4.5:1 on both light grounds. */
+  --muted-foreground: #4a504c;
+
+  /* Muted brass, split by ground for readable small text and quiet highlights. */
+  --gold: #6f5a2b;
+  --gold-bright: #e3c99b;
+  --gold-dim: #8a7043;
+
+  --accent: #e3c99b;
+  --accent-foreground: var(--ink);
+
+  --border: rgb(19 26 24 / 16%);
+  --input: rgb(19 26 24 / 26%);
+  --ring: #0f5d4c;
+  --destructive: #a33a2a;
+  --destructive-foreground: #fbf7f0;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* The edge rail is fixed; anchors must clear it. */
+    scroll-padding-top: 2rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.65;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    /* Tight leading at display sizes is the difference between editorial and
+       airy. */
+    line-height: 1.02;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-emerald);
+    color: var(--color-cream);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Type scale — fluid throughout, so there is no breakpoint where type jumps.
+   -------------------------------------------------------------------------- */
+
+@utility display-hero {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 13vw, 10rem);
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  font-weight: 300;
+}
+
+@utility display-1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6.6vw, 5rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  font-weight: 300;
+}
+
+@utility display-2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.2vw, 3.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  font-weight: 300;
+}
+
+/* Tiny wide-tracked label. The connective tissue of the whole page — section
+   kickers, metadata, buttons. */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  /* Ground-aware: dark sections set --eyebrow-color to the bright brass, so the
+     label never ends up olive-on-green or olive-on-deep green. */
+  color: var(--eyebrow-color, var(--color-gold));
+}
+
+/* Every dark ground flips the eyebrow to the bright brass. */
+.bg-ink,
+.bg-emerald,
+.bg-emerald-deep,
+.bg-ground-warm {
+  --eyebrow-color: var(--color-gold-bright);
+}
+
+@utility meta {
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+/* Set in the serif at body size — dates, names, quiet statements. */
+@utility serif-meta {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+@utility body-copy {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--color-muted-foreground);
+  max-width: 58ch;
+}
+
+@utility measure {
+  max-width: 56ch;
+}
+
+/* --------------------------------------------------------------------------
+   Layout
+   -------------------------------------------------------------------------- */
+
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 84rem;
+  padding-inline: 1.5rem;
+  @media (width >= 48rem) {
+    padding-inline: 2.5rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 4rem;
+  }
+}
+
+/* Irregular on purpose: uniform section padding is what makes a long page feel
+   like a template. */
+@utility section-y {
+  padding-block: clamp(5rem, 12vw, 10rem);
+}
+
+@utility section-y-lg {
+  padding-block: clamp(6rem, 15vw, 13rem);
+}
+
+/* --------------------------------------------------------------------------
+   Motifs
+   -------------------------------------------------------------------------- */
+
+/* Roman numeral inside a hairline circle. Sits before every section kicker and
+   is the strongest repeated signal of the whole design. */
+@utility numeral-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid currentColor;
+  border-radius: 9999px;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  flex: none;
+}
+
+/* A small centred diamond used as a section ornament. */
+@utility lozenge {
+  display: inline-block;
+  width: 0.3125rem;
+  height: 0.3125rem;
+  rotate: 45deg;
+  background: currentColor;
+}
+
+/* ॐ — Devanagari is absent from the Latin display faces, so it falls through
+   to the platform's traditional glyph rather than rendering as a tofu box. */
+@utility devanagari {
+  font-family: "Noto Serif Devanagari", "Nirmala UI", "Kohinoor Devanagari", "Mangal", serif;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* Gujarati is NOT Devanagari — a different script with different glyph forms, and
+   a Devanagari face renders it as unrelated shapes or as tofu. The ceremony
+   names come straight off the invitation, so they need a real Gujarati stack.
+   `Shruti` and `Nirmala UI` are the Windows equivalents; the Noto face is
+   loaded from Google Fonts for everything else. */
+@utility gujarati {
+  font-family: "Noto Serif Gujarati", "Shruti", "Nirmala UI", "Lohit Gujarati", serif;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Film grain. One inline SVG turbulence, tiled. Keeps large flat grounds from
+   reading as flat digital colour. */
+@utility grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.28;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  }
+}
+
+/* Guarantees a dark floor under overlaid type whatever the photograph is
+   doing in that region. */
+@utility scrim {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgb(10 20 18 / 0.55) 0%,
+      rgb(10 20 18 / 0.18) 42%,
+      rgb(10 20 18 / 0.55) 100%
+    );
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Opening: the photograph develops
+   --------------------------------------------------------------------------
+   The hero's central idea. The names arrive first, alone in the dark, and the
+   photograph then comes up *behind* them the way a print develops in a tray:
+   flat, desaturated and lifted at first, resolving to full contrast.
+
+   Driven by one custom property, --reveal, animated 0 -> 1 by GSAP. Keeping it
+   in a custom property rather than three separate tweens means the aperture,
+   the tonal shift and the bloom are guaranteed to stay in lockstep, and a
+   single stylesheet rule can describe the whole effect.
+
+   The filter is cleared once the reveal completes (see Hero.tsx), so the
+   photograph costs nothing after the first two seconds.
+   -------------------------------------------------------------------------- */
+
+@layer components {
+  /* Everything is derived from one custom property so the aperture, the tonal
+     shift and the bloom cannot drift out of sync with each other.
+
+     Both expressions resolve to identity at --reveal: 1, so the photograph ends
+     up untouched rather than parked on a leftover filter. An earlier version
+     tried to clear the filter with clearProps after the animation, which does
+     nothing: clearProps only removes inline styles, and this filter comes from
+     the stylesheet, so the photograph stayed flat and desaturated forever. */
+  [data-develop] {
+    --reveal: 0;
+
+    /* Aperture: a horizontal seam at the vertical centre that opens outward. */
+    clip-path: inset(
+      calc((1 - var(--reveal)) * 50%) 0% calc((1 - var(--reveal)) * 50%) 0%
+    );
+
+    /* An undeveloped print resolving to a finished one. */
+    filter: contrast(calc(0.15 + 0.85 * var(--reveal)))
+      saturate(var(--reveal))
+      brightness(calc(1.35 - 0.35 * var(--reveal)));
+  }
+
+  /* Once the reveal has played, drop the filter entirely. Leaving
+     filter: contrast(1) saturate(1) in place would keep a filter on a
+     full-screen image for the rest of the visit — cheap to write, not free to
+     render. */
+  [data-develop][data-settled] {
+    filter: none;
+  }
+
+  [data-develop]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: calc(1 - var(--reveal));
+    /* A warm bloom that leads the reveal and dies as it completes, so the
+       photograph looks lit from within rather than merely faded in. */
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgb(227 201 155 / 0.42) 0%,
+      rgb(15 93 76 / 0.3) 45%,
+      transparent 72%
+    );
+  }
+
+  /* --------------------------------------------------------------------
+     Ambient petals
+     --------------------------------------------------------------------
+     Seven out-of-focus petals drifting down through the dark ground. They are
+     the only ambient motion on the site, and they are here because this is a
+     wedding: marigold and jasmine falling. Deliberately large, heavily blurred
+     and very low contrast, so they read as depth-of-field bokeh rather than as
+     particles.
+
+     Each is given its own duration, delay, drift and size below, so the field
+     never loops in sync and never reads as one repeating texture.
+     -------------------------------------------------------------------- */
+
+  .petals {
+    container-type: inline-size;
+  }
+
+  .petal {
+    position: absolute;
+    top: 0;
+    height: auto;
+    border-radius: 9999px;
+    pointer-events: none;
+    will-change: transform;
+
+    /* Peak opacity for this petal, declared as a custom property rather than as
+       `opacity` on purpose. The fall animation below animates `opacity`
+       directly, and a running CSS animation always beats a normal declaration
+       in the cascade — so each petal's own `opacity` was silently overridden by
+       the keyframe and every petal rendered at full strength regardless of what
+       was written here. The animation has to read its plateau from this
+       variable instead. */
+    --petal-opacity: 0.12;
+
+    background: radial-gradient(
+      circle at 38% 32%,
+      rgb(227 201 155 / 0.5) 0%,
+      rgb(169 138 85 / 0.26) 46%,
+      rgb(15 93 76 / 0) 72%
+    );
+    animation: petal-fall linear infinite;
+  }
+
+  @keyframes petal-fall {
+    0% {
+      transform: translate3d(0, -18vh, 0) rotate(0deg);
+      opacity: 0;
+    }
+    12% {
+      opacity: var(--petal-opacity);
+    }
+    85% {
+      opacity: var(--petal-opacity);
+    }
+    100% {
+      transform: translate3d(var(--drift, 4vw), 118vh, 0) rotate(320deg);
+      opacity: 0;
+    }
+  }
+
+  /* Opacities are low and were lowered again after the hero ground was lifted.
+     On the old near-black they read as bokeh; on the brighter ground the same
+     values read as lens-flare smudges and pulled the eye off the photograph.
+     A light blob on a mid-dark ground only reads as atmosphere while it is
+     closer to the threshold of visibility than it is to being seen.
+
+     Sized in cqw against the hero so they scale with the viewport instead of
+     staying a fixed pixel size. At 1440px the earlier fixed sizes read as
+     distinct blobs competing with the photograph rather than as atmosphere. */
+  .petal:nth-child(1) { left: 5%;  width: 4.2cqw; aspect-ratio: 1; filter: blur(7px);  --petal-opacity: 0.15; animation-duration: 26s; animation-delay: -3s;  --drift: 7vw; }
+  .petal:nth-child(2) { left: 21%; width: 2.4cqw; aspect-ratio: 1; filter: blur(5px);  --petal-opacity: 0.12; animation-duration: 33s; animation-delay: -14s; --drift: -6vw; }
+  .petal:nth-child(3) { left: 37%; width: 5.6cqw; aspect-ratio: 1; filter: blur(9px);  --petal-opacity: 0.09; animation-duration: 41s; animation-delay: -7s;  --drift: 5vw; }
+  .petal:nth-child(4) { left: 55%; width: 3.0cqw; aspect-ratio: 1; filter: blur(7px);  --petal-opacity: 0.13; animation-duration: 29s; animation-delay: -21s; --drift: -8vw; }
+  .petal:nth-child(5) { left: 69%; width: 6.6cqw; aspect-ratio: 1; filter: blur(11px); --petal-opacity: 0.07; animation-duration: 47s; animation-delay: -11s; --drift: 6vw; }
+  .petal:nth-child(6) { left: 82%; width: 2.0cqw; aspect-ratio: 1; filter: blur(4px);  --petal-opacity: 0.16; animation-duration: 24s; animation-delay: -18s; --drift: -4vw; }
+  .petal:nth-child(7) { left: 92%; width: 3.6cqw; aspect-ratio: 1; filter: blur(8px);  --petal-opacity: 0.11; animation-duration: 37s; animation-delay: -25s; --drift: 9vw; }
+
+  /* The petals are decorative, so under reduced motion they are removed rather
+     than frozen: a static petal hanging in mid-air would read as a bug. */
+  @media (prefers-reduced-motion: reduce) {
+    .petal {
+      display: none;
+    }
+  }
+}
+/* --------------------------------------------------------------------------
+   Interactive
+   -------------------------------------------------------------------------- */
+
+@utility link-wipe {
+  position: relative;
+  display: inline-block;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.15em;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Pre-hydration reveal guard
+   --------------------------------------------------------------------------
+   Reveals start hidden. An inline script adds `motion` to <html> before first
+   paint, and the root shell sets `data-hydrated` in a layout effect — after
+   React has flushed every child's layout effect, so each reveal has already
+   written its own opacity:0 inline by the time this rule lifts.
+
+   Without the :not([data-hydrated]) guard the rule keeps overriding the
+   animation and re-hides every section the instant it fades in.
+   -------------------------------------------------------------------------- */
+
+html.motion:not([data-hydrated]) [data-reveal] {
+  opacity: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Moments — the horizontal gallery
+   --------------------------------------------------------------------------
+   This section is pinned, so the whole composition has to fit inside 100svh
+   with the photographs uncropped. `--mom-card-w` is therefore the smallest of
+   three independent constraints, and the card's 4:5 aspect turns that width
+   into its height:
+
+     1. viewport width less a gutter — makes the card full-bleed on a phone
+     2. leftover height, times 0.8    — 1 / 1.25, because height = width * 5/4
+     3. 34rem                        — stops it ballooning on a 4K display
+
+   Every term scales with the viewport, so the section stays correctly
+   proportioned from a 360px phone to a 4K monitor without a single breakpoint.
+
+   These must live OUTSIDE the reduced-motion block below. They were briefly
+   inside it, which left `--mom-card-w` undefined in normal motion; an undefined
+   custom property makes `width` invalid, so every card silently fell back to
+   sizing itself from its content and came out a constant 538px wide at every
+   viewport from 1024 to 1600 — which also meant the pinned composition
+   overflowed a 720px-tall laptop by 201px.
+
+   `--mom-card-w` here is only the value used for the very first paint, before
+   JS measures the real chrome. It is a fallback, not the mechanism: Moments.tsx
+   measures the label, caption and progress row and writes the result back, which
+   no constant can do because that chrome scales with the type ramp.
+   -------------------------------------------------------------------------- */
+
+.moments-track {
+  --mom-pad: clamp(1rem, 2.5svh, 2.25rem);
+  /* Everything in the pinned composition that is not the photograph: the
+     section label, the caption under each card, and the progress row. */
+  --mom-fixed: 8rem;
+  /* The cap only matters on very large displays, where the height budget is not
+     the binding constraint. 34rem left a 1920px monitor with a static three-up
+     and no travel at all; 40rem was still 1px short; 44rem lets three cards
+     exceed 1920 so the gallery keeps scrolling on the widest screens. */
+  --mom-card-w: min(
+    calc(100vw - 2.5rem),
+    calc((100svh - (var(--mom-pad) * 2) - var(--mom-fixed)) * 0.8),
+    44rem
+  );
+}
+
+.moments-card {
+  width: var(--mom-card-w);
+}
+
+/* Shadow lift for the first photograph.
+
+   Measured, not guessed: the card renders at mean luminance 98 from a source of
+   97, so no overlay, blend or filter in the UI was responsible. The file just
+   carries crushed shadows — 5th percentile 25 against a median of 98 — and it
+   sits beside a cream ground around 235, which makes a correctly exposed
+   mid-tone read as murky by comparison.
+
+   `brightness` alone would have blown the marigold garlands, which already reach
+   178. Pulling contrast down while lifting brightness raises the black point and
+   leaves the highlights alone. */
+.moments-lift {
+  filter: brightness(1.13) contrast(0.92) saturate(1.06);
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — a designed static mode, not a kill switch.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.motion:not([data-hydrated]) [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  /* The horizontal gallery becomes a plain vertical stack, so every photograph
+     is reachable without a scroll gesture. */
+  .moments-track {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    transform: none !important;
+  }
+
+  .moments-card {
+    width: min(100%, 26rem);
+    margin-inline: auto;
+  }
+
+  .moments-lift {
+    filter: none;
+  }
+}

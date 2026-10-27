@@ -1,0 +1,368 @@
+/* ==========================================================================
+   THE ENVELOPE — initial loading and entry experience
+   ==========================================================================
+
+   Built from CSS 3D rather than WebGL. The whole object is five flat layers in
+   a preserve-3d rig, so the depth is real — the flap genuinely rotates about its
+   top edge and the card genuinely travels toward the viewer — and it costs
+   nothing to composite. A canvas renderer would have been the wrong tool for
+   five polygons, and it would have put a second rendering loop in front of a
+   page that already has one.
+
+   LAYER ORDER, which is the whole illusion:
+
+     back      translateZ(-6px)   the far face of the envelope
+     card      translateZ(-2px)   the invitation, hidden behind the pocket
+     front     translateZ(1px)   the near face, V-notched, drawn over the card
+     flap      translateZ(3px)   pivots on its top edge
+     seal      translateZ(7px)   the wax disc, sitting proud of everything
+
+   The card is tucked *behind* the notched front and rises through the notch, so
+   it is revealed by geometry rather than faded in. That is what separates an
+   envelope opening from a rectangle rotating away.
+
+   Palette follows the site: deep green ground, warm ivory stock, and restrained
+   brass foil. Nothing here is a stock wedding graphic.
+   ========================================================================== */
+
+.env {
+  /* One knob for the whole object, and it fills the screen.
+
+     Bounded by both axes rather than by a fixed width: the rig is 1.52:1, so a
+     width that looks generous on a wide monitor will overflow a short laptop.
+     `94vh` is derived from that ratio against a 62% height budget, which is what
+     leaves room for the "tap to open" hint underneath.
+
+     It used to be `min(86vw, 30rem)`, and that 30rem cap meant the envelope was
+     480px wide on a 1440px screen — the same size it was on a tablet, and
+     apparently not the presence the first screen needs to have. */
+  --env-w: min(92vw, 94vh);
+  --env-paper-hi: #fbf7f0;
+  --env-paper: #efe7da;
+  --env-paper-lo: #ddd2c0;
+  --env-shade: #a79c8a;
+}
+
+.env__stage {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--emerald-deep);
+  overflow: hidden;
+
+  /* Perspective on the STAGE, not on the envelope. The rig is a child, so every
+     layer shares one vanishing point — which is what makes the flap read as
+     hinging rather than as a sprite turning in place. */
+  perspective: 1100px;
+  perspective-origin: 50% 44%;
+}
+
+/* The tilt. Slightly off-axis in both planes so two vertical edges of the
+   envelope are visibly different lengths. A dead-on envelope reads as flat no
+   matter how good the shading is. */
+.env__rig {
+  position: relative;
+  width: var(--env-w);
+  aspect-ratio: 1.52 / 1;
+  transform-style: preserve-3d;
+  transform: rotateX(6deg) rotateY(-8deg);
+  will-change: transform;
+}
+
+/* Contact shadow on the surface below. Behind everything in Z, so it never
+   travels with the flap and never floats above the card. */
+.env__shadow {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: -8%;
+  height: 24%;
+  background: radial-gradient(ellipse at 50% 50%, rgb(0 0 0 / 0.5), transparent 70%);
+  filter: blur(7px);
+  transform: translateZ(-16px);
+}
+
+.env__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  transform: translateZ(-6px);
+  background: linear-gradient(168deg, var(--env-paper-lo) 0%, var(--env-shade) 100%);
+  box-shadow: 0 26px 54px -22px rgb(0 0 0 / 0.7);
+}
+
+/* The lining.
+
+   Without this the two upper corners of the pocket — the wedges between the
+   flap's lower edge and the notch's upper edge — showed the invitation card
+   straight through, so a sealed envelope had two pale triangles and a pale band
+   along its top edge that read as a mistake rather than as paper.
+
+   Those wedges are geometrically unavoidable. The flap is hinged at the top
+   edge and the pocket's notch starts partway down, so no single triangle and no
+   single rectangle covers them. A real envelope shows its own interior there;
+   this layer is that interior. It sits behind the card and in front of the
+   back, so whatever the flap and pocket do not cover reads as the inside of the
+   envelope rather than as the thing inside it. */
+.env__lining {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  transform: translateZ(-4px);
+  background: linear-gradient(172deg, var(--env-shade) 0%, var(--env-paper-lo) 100%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.28) inset;
+}
+
+.env__card {
+  position: absolute;
+  /* Inset enough that the card's own corners stay inside the flap's triangle
+     while it is closed. At top 10% the flap spans 9.1%-90.9% of the width, so a
+     card at 10%-90% is never wider than the flap above it — which is what stops
+     a pale edge peeking over the top of a sealed envelope. */
+  left: 10%;
+  right: 10%;
+  top: 10%;
+  height: 84%;
+  border-radius: 3px;
+  transform: translateZ(-2px) translateY(0);
+  will-change: transform;
+  display: grid;
+  place-items: center;
+  gap: 1.1rem;
+  padding: 6% 7%;
+  text-align: center;
+  background: linear-gradient(168deg, #fcf8f0 0%, #f4ebda 60%, #ece1cc 100%);
+  box-shadow:
+    0 16px 34px -18px rgb(0 0 0 / 0.62),
+    0 1px 0 rgb(255 255 255 / 0.75) inset;
+}
+
+/* The near face. Its V is cut to the same depth as the flap, so the two meet at
+   a point instead of overlapping, and the creases double as the envelope's fold
+   lines. */
+.env__front {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(1px);
+  clip-path: polygon(0 44%, 50% 72%, 100% 44%, 100% 100%, 0 100%);
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(
+    168deg,
+    var(--env-paper-hi) 0%,
+    var(--env-paper) 46%,
+    var(--env-paper-lo) 100%
+  );
+  box-shadow: 0 20px 44px -20px rgb(0 0 0 / 0.66);
+}
+
+/* A single hairline down each crease. At rest this is the only thing telling
+   you the near face is folded rather than printed. */
+.env__crease {
+  position: absolute;
+  top: 44%;
+  width: 1px;
+  height: 28%;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.16), transparent);
+  transform: translateZ(2px);
+}
+
+.env__flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  /* 72%, matching the pocket's notch: the flap's point lands exactly on the
+     pocket's point. */
+  height: 72%;
+  transform-origin: top center;
+  transform: translateZ(3px) rotateX(0deg);
+  will-change: transform;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  border-radius: 5px 5px 0 0;
+  background: linear-gradient(
+    184deg,
+    var(--env-paper-hi) 0%,
+    var(--env-paper) 58%,
+    var(--env-paper-lo) 100%
+  );
+  box-shadow: 0 10px 18px -12px rgb(0 0 0 / 0.55);
+}
+
+/* ---- The seal ----
+
+   The anchor carries the centring and the Z position, so the button itself has
+   no transform of its own. That is deliberate: a seal centred with
+   `translate(-50%, -50%)` has its centring read into GSAP as x/y, and the first
+   `.to(seal, { y: 30 })` then overwrites it and flings the seal out of place.
+   Margin nudges it down toward the flap's point without touching a transform,
+   leaving GSAP free to own scale, rotation and travel. */
+.env__seal-anchor {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform: translateZ(7px);
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.env__seal {
+  position: relative;
+  /* Sits on the join of flap and pocket, which is at 72% of the rig's height —
+     so it is pushed down past centre by a fifth of the height to land there. */
+  margin-top: 21%;
+  width: clamp(3.5rem, 9.5vw, 4.9rem);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+
+  border-radius: 999px;
+  color: #2c2416;
+  background: radial-gradient(
+    circle at 34% 28%,
+    #ecdcb4 0%,
+    #d3b780 42%,
+    #a08249 100%
+  );
+  box-shadow:
+    0 10px 22px -8px rgb(0 0 0 / 0.6),
+    0 1px 1px rgb(255 255 255 / 0.5) inset,
+    0 -2px 5px rgb(0 0 0 / 0.3) inset;
+  display: grid;
+  place-items: center;
+  transition: filter 400ms ease;
+}
+
+.env__seal:hover {
+  filter: brightness(1.07);
+}
+
+.env__seal:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 5px;
+}
+
+/* The impressed rim a wax seal leaves behind. Drawn as an inset ring rather
+   than a border so it takes the same light as the disc. */
+.env__seal::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 999px;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.35) inset,
+    0 0 0 1px rgb(0 0 0 / 0.16) inset;
+}
+
+.env__seal span {
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 2.4vw, 1.05rem);
+  letter-spacing: 0.06em;
+  text-indent: 0.06em;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+/* ---- Type on the card ---- */
+
+.env__card-mark {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  color: oklch(0.3 0.06 24);
+}
+
+.env__card-rule {
+  width: 4.5rem;
+  height: 1px;
+  background: oklch(0.62 0.09 62 / 0.55);
+}
+
+.env__card-line {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: oklch(0.34 0.05 30 / 0.72);
+}
+
+/* ---- The hint ---- */
+
+.env__hint {
+  margin-top: clamp(1.75rem, 5vh, 2.75rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.env__hint-text {
+  font-family: var(--font-sans);
+  font-size: 0.5rem;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  color: rgb(241 235 225 / 0.72);
+  animation: env-breathe 2.6s ease-in-out infinite;
+}
+
+.env__hint-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gold-bright);
+  animation: env-breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes env-breathe {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---- Fallbacks ----
+   A device without real 3D still gets an envelope: the layers stack, the flap
+   and card cross-fade, and the whole opening is still one motion. Nothing is
+   lost except the rotation, which is the part such a device cannot show. */
+@supports not (transform-style: preserve-3d) {
+  .env__rig {
+    transform: none;
+  }
+
+  .env__flap {
+    transform: translateZ(3px);
+  }
+
+  .env__card {
+    transform: translateZ(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The concept survives: seal releases, flap lifts away, card rises. The
+     rotation is what goes, because it is the part that implies travel. */
+  .env__rig,
+  .env__card,
+  .env__flap,
+  .env__seal {
+    transition: none;
+  }
+
+  .env__hint-text,
+  .env__hint-dot {
+    animation: none;
+    opacity: 0.7;
+  }
+
+  .env__shadow {
+    filter: none;
+  }
+}

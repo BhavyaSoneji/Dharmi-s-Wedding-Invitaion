@@ -1,0 +1,9 @@
+# Normalise line endings so snapshots and the working tree don't produce
+# spurious whole-file diffs, and so git doesn't warn on every add.
+* text=auto eol=lf
+
+*.jpg binary
+*.png binary
+*.wav binary
+*.ico binary
+public/Teaser_2.mp4 filter=lfs diff=lfs merge=lfs -text
